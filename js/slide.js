@@ -9,6 +9,10 @@ export default class Slide {
     };
   }
 
+  transition(active){
+    this.slide.style.transition = active ? 'transform .3s' : ''
+  }
+
   moveSlide(distX) {
     this.dist.movePosition = distX;
 
@@ -33,7 +37,8 @@ export default class Slide {
     }
     
     this.wrapper.addEventListener(movetype, this.onMove);
-    this.activeEvent = movetype;
+    this.activeEvent = movetype
+    this.transition(false)
   }
 
   onMove(event) {
@@ -44,10 +49,23 @@ export default class Slide {
   }
 
   onEnd(event) {
-    const movetype = (event.type === 'mouseup') ? 'mousemove' : 'touchmove'
+    const movetype = (event.type === 'mouseup') ? 'mousemove' : 'touchmove';
 
     this.wrapper.removeEventListener(this.activeEvent, this.onMove);
     this.dist.finalPosition = this.dist.movePosition;
+    this.transition(true)
+    this.changeSlideOnEnd();
+
+  }
+
+  changeSlideOnEnd(){
+    if (this.dist.movement > 120 && this.index.next !== undefined){
+        this.activeNextSlide()
+    } else if (this.dist.movement < -120 && this.index.prev !== undefined){
+        this.activePrevSlide()
+    }else{
+        this.changeSlide(this.index.active)
+    }
   }
 
   addSlideEvents() {
@@ -61,6 +79,7 @@ export default class Slide {
     this.onStart = this.onStart.bind(this);
     this.onMove = this.onMove.bind(this);
     this.onEnd = this.onEnd.bind(this);
+    this.changeSlideOnEnd = this.changeSlideOnEnd.bind(this);
   }
 
   slidePosition(slide){
@@ -83,26 +102,38 @@ export default class Slide {
     const last = this.slideArray.length -1
 
     this.index ={
-        prev: index ? index - 1 : null,
+        prev: index ? index - 1 : undefined,
         active: index,
-        next: index === last ? null : index + 1,
+        next: index === last ? undefined : index + 1,
     
     }
   }
 
+
+
   changeSlide(index){
     const activeSlide = this.slideArray[index]
 
-    this.moveSlide(this.slideArray[index].position)
+    this.moveSlide(this.slideArray[index].posicao)
     this.slideIndexNav(index)
-    this.dist.finalPosition = activeSlide.position
+    this.dist.finalPosition = activeSlide.posicao
   }
 
+  activePrevSlide(){
+    if(this.index.prev !== undefined)  this.changeSlide(this.index.prev)
+  }
 
-  init() {
+  activeNextSlide(){
+    if(this.index.next !== undefined)  this.changeSlide(this.index.next)
+  }
+
+init() {
+      this.transition(true)
     this.bindEvents();
     this.addSlideEvents();
-    this.slidesConfig()
+    this.slidesConfig();
+    this.slideIndexNav(0);
+
 
     return this;
   }

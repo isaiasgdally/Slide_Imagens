@@ -44,23 +44,61 @@ img {
   transform: scale(1);
 }
 
-[data-control="slide"]{
+.custom-controls{
+  cursor: pointer;
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
 }
 
-[data-control="slide"] li a{
-  display: block;
-  width: 12px;
-  height: 12px;
-  background: #fb5;
+.custom-controls li{
+  opacity: .8;
+  transform: scale(.8);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  text-indent: -1000px;
-  margin: 5px;
+  margin: 2px;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.5);
+  transition: .3s;
 }
 
-[data-control="slide"] li.active a, [data-control="slide"] li a:hover{
-  background: #e54;
+.custom-controls li.active{
+  opacity: 1;
+  transform: scale(1);
+}
+
+.arrow-nav{
+  display: flex;
+  justify-content: center;
+  gap: clamp(60px, 50vw, 400px);
+  margin: 20px 0px;
+}
+
+@media (max-width: 768px) {
+  .arrow-nav {
+    gap: clamp(40px, 30vw, 200px);
+  }
+}
+
+@media (max-width: 480px) {
+  .arrow-nav {
+    gap: clamp(30px, 25vw, 120px);
+  }
+}
+
+.arrow-nav button{
+  cursor: pointer;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background: #fb5 url('../img/arrow.svg')center center no-repeat;
+}
+
+.arrow-nav button.prev{
+ transform: rotate(-180deg); 
 }

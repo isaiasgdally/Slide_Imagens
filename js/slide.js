@@ -157,98 +157,87 @@ export class Slide {
     this.addSlideEvents();
     this.slidesConfig();
     this.slideIndexNav(0);
-    this.changeActiveClass();
+    this.changeSlide(0); 
     this.addResizeEvent();
 
     return this;
   }
 }
 
-export class SlideNav extends Slide{
-    addArrow(prev, next){
-        this.prevElement = document.querySelector(prev);
-        this.nextElement = document.querySelector(next);
-        this.addArrowEvent();
+export class SlideNav extends Slide {
+  addArrow(prev, next) {
+    this.prevElement = document.querySelector(prev);
+    this.nextElement = document.querySelector(next);
+    this.addArrowEvent();
+  }
+
+  addArrowEvent() {
+    this.prevElement.addEventListener("click", this.activePrevSlide);
+    this.nextElement.addEventListener("click", this.activeNextSlide);
+  }
+
+  changeSlideOnControl(index) {
+    this.changeSlide(index);
+    this.activeCustomControlItem();
+  }
+
+  activePrevSlide() {
+    if (this.index.prev !== undefined) {
+      this.changeSlide(this.index.prev);
+      this.activeCustomControlItem();
     }
+  }
 
-    addArrowEvent(){
-        this.prevElement.addEventListener('click', this.activePrevSlide);
-        this.nextElement.addEventListener('click', this.activeNextSlide);
+  activeNextSlide() {
+    if (this.index.next !== undefined) {
+      this.changeSlide(this.index.next);
+      this.activeCustomControlItem();
     }
+  }
 
-    createControl(){
-        const control = document.createElement('ul');
-        control.dataset.control = 'slide';
-
-        this.slideArray.forEach((item, index) =>{
-            control.innerHTML += `<li><a href="#slide${index + 1}">${index + 1}</a></li>`;
-        });
-        this.wrapper.appendChild(control);
-        this.control = control;
-        this.addControlEvent();
-        this.activeControlItem(); 
+  addCustomControl(selector) {
+    this.customControl = document.querySelector(selector);
+    if (this.customControl) {
+      this.addCustomControlEvent();
+      this.activeCustomControlItem();
     }
+  }
 
+  eventCustomControl(item, index) {
+    item.addEventListener("click", (event) => {
+      event.preventDefault();
+      this.changeSlideOnControl(index);
+      this.activeCustomControlItem();
+    });
+  }
 
-
-    eventControl(item, index){
-        item.addEventListener('click', (event) => {
-            event.preventDefault();
-            this.changeSlideOnControl(index);
-        });
+  activeCustomControlItem() {
+    if (this.customControlArray) {
+      this.customControlArray.forEach((item) =>
+        item.classList.remove(this.activeClass)
+      );
+      this.customControlArray[this.index.active].classList.add(this.activeClass);
     }
+  }
 
-    activeControlItem(){
-        this.controlArray.forEach(item => item.classList.remove(this.activeClass));
-        this.controlArray[this.index.active].classList.add(this.activeClass);
-    }
+  addCustomControlEvent() {
+    this.customControlArray = [...this.customControl.children];
+    this.customControlArray.forEach((item, index) => {
+      this.eventCustomControl(item, index);
+    });
+  }
 
-    changeSlideOnControl(index) {
-        this.changeSlide(index);
-        this.activeControlItem();
-    }
+  bindEvents() {
+    this.onStart = this.onStart.bind(this);
+    this.onMove = this.onMove.bind(this);
+    this.onEnd = this.onEnd.bind(this);
+    this.changeSlideOnEnd = this.changeSlideOnEnd.bind(this);
+    this.changeActiveClass = this.changeActiveClass.bind(this);
+    this.onResize = debounce(this.onResize.bind(this), 50);
 
-    activePrevSlide() {
-        if (this.index.prev !== undefined) {
-            this.changeSlide(this.index.prev);
-            this.updateControlActive();
-        }
-    }
-
-    activeNextSlide() {
-        if (this.index.next !== undefined) {
-            this.changeSlide(this.index.next);
-            this.updateControlActive();
-        }
-    }
-
-    updateControlActive() {
-        if (this.controlArray) {
-            this.activeControlItem();
-        }
-    }
-
-    addControlEvent(){
-        this.controlArray = [...this.control.children];
-        this.controlArray.forEach((item, index) => {
-            this.eventControl(item, index);
-        });
-    }
-
-    bindEvents() {
-        this.onStart = this.onStart.bind(this);
-        this.onMove = this.onMove.bind(this);
-        this.onEnd = this.onEnd.bind(this);
-        this.changeSlideOnEnd = this.changeSlideOnEnd.bind(this);
-        this.changeActiveClass = this.changeActiveClass.bind(this);
-        this.onResize = debounce(this.onResize.bind(this), 50);
-
-        this.activePrevSlide = this.activePrevSlide.bind(this);
-        this.activeNextSlide = this.activeNextSlide.bind(this);
-        this.eventControl = this.eventControl.bind(this);
-        this.activeControlItem = this.activeControlItem.bind(this);
-        this.updateControlActive = this.updateControlActive.bind(this);
-    }
-
-
+    this.activePrevSlide = this.activePrevSlide.bind(this);
+    this.activeNextSlide = this.activeNextSlide.bind(this);
+    this.eventCustomControl = this.eventCustomControl.bind(this);
+    this.activeCustomControlItem = this.activeCustomControlItem.bind(this);
+  }
 }
